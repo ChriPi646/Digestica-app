@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
-import BellyDrQuestionnaire from './components/BellyDrQuestionnaire';
-import ReportsMenu from './components/ReportsMenu';
 
-
-type PageType = 'home' | 'vragenlijst' | 'stappenplan' | 'agenda' | 'fodmap' | 'informatie' | 'shop' | 'login' | 'reports';
+type PageType = 'home' | 'vragenlijst' | 'stappenplan' | 'agenda' | 'fodmap' | 'informatie' | 'shop' | 'login';
 
 const DigesticaApp: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
-  const [showWelcomePopup, setShowWelcomePopup] = useState(true);
 
   // Digestica Logo - Simple interlocked D's
   const DigesticaLogo: React.FC<{ size?: number }> = ({ size = 20 }) => (
@@ -22,69 +18,17 @@ const DigesticaApp: React.FC = () => {
     </div>
   );
 
-  // Welcome Popup Component
-  const WelcomePopup = () => {
-    if (!showWelcomePopup) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center relative">
-          <button
-            onClick={() => setShowWelcomePopup(false)}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-          >
-            ✕
-          </button>
-          
-          <div className="flex items-center justify-center mb-4">
-            <img 
-              src="/TheBellyDrLogo.png" 
-              alt="The Belly Dr." 
-              className="h-32 w-auto"
-            />
-          </div>
-          
-          <h2 className="text-3xl font-bold text-blue-900 mb-6 leading-tight">
-            🔍 Ontdek eindelijk de<br />oorzaak van uw buikklachten
-          </h2>
-          
-          <p className="text-gray-600 mb-8 text-lg leading-relaxed">
-            Beantwoord enkele vragen en krijg een gepersonaliseerd inzicht in mogelijke oorzaken van uw klachten.
-          </p>
-          
-          <button
-            onClick={() => {
-              setShowWelcomePopup(false);
-              setCurrentPage('vragenlijst');
-            }}
-            className="w-full bg-blue-900 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-800 transition-colors mb-8"
-          >
-            🎯 Start Analyse
-          </button>
-          
-          <div className="flex items-center justify-center space-x-2">
-            <img 
-              src="/digestica-logo.png" 
-              alt="Digestica" 
-              className="h-8 w-auto"
-            />
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   // Navigation Component
   const Navigation = () => (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* The Belly Dr Logo */}
+          {/* The Belly Dr. Logo - Complete logo with text included */}
           <div className="flex items-center">
             <img 
-              src="/TheBellyDrLogo.png" 
+              src="/logo.png" 
               alt="The Belly Dr." 
-              className="h-24 w-auto cursor-pointer"
+              className="h-11 w-auto cursor-pointer"
               onClick={() => setCurrentPage('home')}
             />
           </div>
@@ -125,10 +69,10 @@ const DigesticaApp: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center mb-6">
             <img 
-              src="/TheBellyDrLogo.png" 
+              src="/logo.png" 
               alt="The Belly Dr." 
               className="h-32 w-auto"
             />
@@ -146,7 +90,7 @@ const DigesticaApp: React.FC = () => {
             { 
               page: 'vragenlijst', 
               title: 'Vragenlijst', 
-              desc: 'Start met een uitgebreide vragenlijst voor diagnose-inzichten',
+              desc: 'Start met een korte vragenlijst voor diagnose-inzichten',
               icon: '📋',
               bgColor: 'bg-blue-50',
               textColor: 'text-blue-700'
@@ -228,11 +172,8 @@ const DigesticaApp: React.FC = () => {
         {/* Company Footer - Digestica Branding */}
         <div className="text-center pt-8 border-t border-gray-200">
           <div className="flex items-center justify-center space-x-2 mb-2">
-            <img 
-              src="/digestica-logo.png" 
-              alt="Digestica" 
-              className="h-8 w-auto"
-            />
+            <DigesticaLogo size={24} />
+            <span className="text-blue-900 font-medium text-sm">Digestica</span>
           </div>
           <p className="text-xs text-gray-500">
             Een medische app van CentepedeX
@@ -265,8 +206,8 @@ const DigesticaApp: React.FC = () => {
     switch (currentPage) {
       case 'home':
         return <HomePage />;
-    case 'vragenlijst':
-        return <BellyDrQuestionnaire onNavigateToReports={() => setCurrentPage('reports')} />;
+      case 'vragenlijst':
+        return <PlaceholderPage title="Vragenlijst" />;
       case 'stappenplan':
         return <PlaceholderPage title="Stappenplan" />;
       case 'agenda':
@@ -277,19 +218,9 @@ const DigesticaApp: React.FC = () => {
         return <PlaceholderPage title="Informatie" />;
       case 'shop':
         return <PlaceholderPage title="Shop" />;
-     case 'reports':
-        return <ReportsMenu 
-          onBack={() => setCurrentPage('home')} 
-          currentReport={(() => {
-            const saved = localStorage.getItem('current_report');
-            return saved ? JSON.parse(saved) : null;
-          })()} 
-        />;
       case 'login':
-    
         return <PlaceholderPage title="Login" />;
       default:
-        
         return <HomePage />;
     }
   };
@@ -297,7 +228,6 @@ const DigesticaApp: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      <WelcomePopup />
       {renderPage()}
     </div>
   );
