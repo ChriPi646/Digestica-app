@@ -4,6 +4,7 @@ type PageType = 'home' | 'vragenlijst' | 'stappenplan' | 'agenda' | 'fodmap' | '
 
 const DigesticaApp: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
+  const [showWelcomePopup, setShowWelcomePopup] = useState(true);
 
   // Digestica Logo - Simple interlocked D's
   const DigesticaLogo: React.FC<{ size?: number }> = ({ size = 20 }) => (
@@ -17,6 +18,56 @@ const DigesticaApp: React.FC = () => {
       </div>
     </div>
   );
+
+  // Welcome Popup Component
+  const WelcomePopup = () => {
+    if (!showWelcomePopup) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center relative">
+          <button
+            onClick={() => setShowWelcomePopup(false)}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          >
+            ✕
+          </button>
+          
+          <div className="flex items-center justify-center mb-6">
+            <img 
+              src="/logo.png" 
+              alt="The Belly Dr." 
+              className="h-16 w-auto"
+            />
+          </div>
+          
+          <h2 className="text-3xl font-bold text-blue-900 mb-6 leading-tight">
+            Analyse van<br />Buikklachten
+          </h2>
+          
+          <p className="text-gray-600 mb-8 text-lg leading-relaxed">
+            Heb jij veel buikklachten en wil je eindelijk de oorzaak te weten komen? 
+            Beantwoord enkele vragen en ontvang een gepersonaliseerd stappenplan.
+          </p>
+          
+          <button
+            onClick={() => {
+              setShowWelcomePopup(false);
+              setCurrentPage('vragenlijst');
+            }}
+            className="w-full bg-blue-900 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-800 transition-colors mb-8"
+          >
+            Start
+          </button>
+          
+          <div className="flex items-center justify-center space-x-2">
+            <DigesticaLogo size={24} />
+            <span className="text-blue-900 font-semibold">Digestica</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // Navigation Component
   const Navigation = () => (
@@ -228,6 +279,7 @@ const DigesticaApp: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
+      <WelcomePopup />
       {renderPage()}
     </div>
   );
