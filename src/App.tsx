@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import BellyDrQuestionnaire from './components/BellyDrQuestionnaire';
 import ReportsMenu from './components/ReportsMenu';
+import SpecificDiseaseQuestionnaires from './components/SpecificDiseaseQuestionnaires';
 
-
-type PageType = 'home' | 'vragenlijst' | 'stappenplan' | 'agenda' | 'fodmap' | 'informatie' | 'shop' | 'login' | 'reports';
-
+type PageType = 'home' | 'vragenlijst' | 'stappenplan' | 'agenda' | 'fodmap' | 'informatie' | 'shop' | 'login' | 'reports' | 'specific-questionnaires';
 const DigesticaApp: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [showWelcomePopup, setShowWelcomePopup] = useState(true);
@@ -91,8 +90,7 @@ const DigesticaApp: React.FC = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            {(['home', 'vragenlijst', 'stappenplan', 'agenda', 'fodmap', 'informatie', 'shop'] as PageType[]).map(page => (
-              <button 
+{(['home', 'vragenlijst', 'specific-questionnaires', 'stappenplan', 'agenda', 'fodmap', 'informatie', 'shop'] as PageType[]).map(page => (              <button 
                 key={page}
                 onClick={() => setCurrentPage(page)}
                 className={`text-gray-700 hover:text-blue-900 px-3 py-2 text-sm font-medium capitalize transition-colors ${
@@ -190,7 +188,15 @@ const DigesticaApp: React.FC = () => {
               icon: '🛒',
               bgColor: 'bg-red-50',
               textColor: 'text-red-700'
-            }
+            },
+            { 
+  page: 'specific-questionnaires', 
+  title: 'Specifieke Tests', 
+  desc: 'Evidence-based vragenlijsten per aandoening',
+  icon: '🔬',
+  bgColor: 'bg-purple-50',
+  textColor: 'text-purple-700'
+}
           ].map(({ page, title, desc, icon, bgColor, textColor }) => (
             <div 
               key={page}
@@ -285,7 +291,12 @@ const DigesticaApp: React.FC = () => {
             return saved ? JSON.parse(saved) : null;
           })()} 
         />;
-      case 'login':
+     case 'specific-questionnaires':
+  return <SpecificDiseaseQuestionnaires 
+    onNavigateToReports={() => setCurrentPage('reports')}
+    onBack={() => setCurrentPage('home')} 
+  />;
+        case 'login':
     
         return <PlaceholderPage title="Login" />;
       default:
