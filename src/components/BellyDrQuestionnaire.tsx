@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ChevronRight, ChevronLeft, FileText, AlertTriangle, Brain, Utensils } from 'lucide-react';
-import MedicalReportMatrix from './MedicalReportMatrix';
 
 interface BellyDrQuestionnaireProps {
   onNavigateToReports?: () => void;
@@ -40,14 +39,11 @@ interface Answers {
   [questionId: number]: string | string[];
 }
 
-interface BellyDrQuestionnaireProps {
-  onNavigateToReports?: () => void;
-}
-
 const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateToReports }) => {
   const [currentSection, setCurrentSection] = useState<number>(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [showResults, setShowResults] = useState<boolean>(false);
+  const [validationErrors, setValidationErrors] = useState<number[]>([]);
 
   const sections: Section[] = [
     {
@@ -263,9 +259,9 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
       {
         id: 27,
         question: "Heeft u tekorten gehad aan ijzer, B12 of foliumzuur?",
-        type: "select",
-        options: ["Nee", "IJzer tekort", "B12 tekort", "Foliumzuur tekort", "Meerdere tekorten", "Geen idee"],
-        scoring: { "Nee": 0, "IJzer tekort": { celiac: 3, ibd: 2 }, "B12 tekort": { celiac: 3, sibo: 3 }, "Foliumzuur tekort": { celiac: 4 }, "Meerdere tekorten": { celiac: 5, ibd: 3 }, "Geen idee": 0 }
+        type: "checkbox",
+        options: ["Nee", "IJzer tekort", "B12 tekort", "Foliumzuur tekort", "Geen idee"],
+        scoring: { "Nee": 0, "IJzer tekort": { celiac: 3, ibd: 2 }, "B12 tekort": { celiac: 3, sibo: 3 }, "Foliumzuur tekort": { celiac: 4 }, "Geen idee": 0 }
       },
       {
         id: 28,
@@ -365,6 +361,13 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
     ]
   };
 
+  // Helper function to get current questionnaire data
+  const getCurrentQuestionnaire = () => {
+    return {
+      questions: questions[currentSection] || []
+    };
+  };
+
   const calculateScores = (): Scores => {
     const scores: Scores = {
       ibs: 0,
@@ -414,22 +417,42 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
   };
 
   const handleAnswer = (questionId: number, answer: string): void => {
-    const question = Object.values(questions).flat().find(q => q.id === questionId);
+    const question = getCurrentQuestionnaire()?.questions.find(q => q.id === questionId);
+    
+    // Clear validation error for this question
+    if (validationErrors.includes(questionId)) {
+      setValidationErrors(prev => prev.filter(id => id !== questionId));
+    }
     
     if (question?.type === 'checkbox') {
+      // Checkbox logic with "Nee" handling
+      if (answer === 'Nee') {
+        // Als "Nee" geselecteerd wordt, clear alle andere antwoorden
+        setAnswers(prev => ({
+          ...prev,
+          [questionId]: ['Nee']
+        }));
+        return;
+      }
+      
       setAnswers(prev => {
         const currentAnswers = (prev[questionId] as string[]) || [];
-        if (currentAnswers.includes(answer)) {
+        
+        // Als iets anders dan "Nee" geselecteerd wordt, verwijder "Nee" eerst
+        let filteredAnswers = currentAnswers.filter(a => a !== 'Nee');
+        
+        if (filteredAnswers.includes(answer)) {
           // Remove answer
+          const newAnswers = filteredAnswers.filter(a => a !== answer);
           return {
             ...prev,
-            [questionId]: currentAnswers.filter(a => a !== answer)
+            [questionId]: newAnswers.length > 0 ? newAnswers : []
           };
         } else {
           // Add answer
           return {
             ...prev,
-            [questionId]: [...currentAnswers, answer]
+            [questionId]: [...filteredAnswers, answer]
           };
         }
       });
@@ -443,11 +466,46 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
   };
 
   const nextSection = (): void => {
+    const questionnaire = getCurrentQuestionnaire();
+    if (!questionnaire) return;
+
+    // Valideer alle vragen in de huidige sectie
+    const currentQuestions = questionnaire.questions;
+    const unansweredQuestions: number[] = [];
+    
+    currentQuestions.forEach((question) => {
+      const answer = answers[question.id];
+      
+      // Check if question is answered
+      if (!answer || (Array.isArray(answer) && answer.length === 0)) {
+        unansweredQuestions.push(question.id);
+      }
+    });
+
+    if (unansweredQuestions.length > 0) {
+      setValidationErrors(unansweredQuestions);
+      // Scroll to first unanswered question
+      setTimeout(() => {
+        const firstUnansweredElement = document.querySelector(`[data-question-id="${unansweredQuestions[0]}"]`);
+        if (firstUnansweredElement) {
+          firstUnansweredElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+      }, 100);
+      return; // Stop hier - ga niet verder
+    }
+
+    // Clear validatie als alle vragen beantwoord zijn
+    setValidationErrors([]);
+
     if (currentSection < sections.length - 1) {
       setCurrentSection(currentSection + 1);
     } else {
       setShowResults(true);
     }
+    
     // Scroll to top after state update
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -471,6 +529,14 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
       return answer && (Array.isArray(answer) ? answer.length > 0 : true);
     }).length;
     return (answeredQuestions / totalQuestions) * 100;
+  };
+
+  const getSectionCompletion = (sectionIndex: number): boolean => {
+    const sectionQuestions = questions[sectionIndex] || [];
+    return sectionQuestions.every(question => {
+      const answer = answers[question.id];
+      return answer && (Array.isArray(answer) ? answer.length > 0 : true);
+    });
   };
 
   const currentQuestions = questions[currentSection] || [];
@@ -592,7 +658,8 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
             Raadpleeg altijd een arts voor definitieve diagnose en behandeling. Bij alarmsymptomen direct contact opnemen met uw huisarts.
           </p>
         </div>
-{/* Medical Report Button */}
+
+        {/* Medical Report Button */}
         <div className="mt-8 pt-6 border-t border-gray-200 text-center">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">📋 Voor Uw Zorgverlener</h3>
           <p className="text-gray-600 mb-6">Genereer een professioneel rapport om mee te nemen naar uw arts</p>
@@ -615,6 +682,7 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
             <span>Rapport Afdrukken</span>
           </button>
         </div>
+        
         <div className="flex justify-center mt-8">
           <button 
            onClick={() => {
@@ -669,9 +737,6 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
         </div>
         
         {/* Progress Bar */}
-        <div className="mt-4"></div>
-        
-        {/* Progress Bar */}
         <div className="mt-4">
           <div className="flex justify-between text-sm text-gray-500 mb-2">
             <span>Voortgang</span>
@@ -688,21 +753,39 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
 
       {/* Section Navigation */}
       <div className="flex flex-wrap justify-center gap-2 mb-8">
-        {sections.map((section, index) => (
-          <div 
-            key={index}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm ${
-              index === currentSection 
-                ? `bg-${section.color}-100 border-${section.color}-300 text-${section.color}-700` 
-                : index < currentSection 
-                  ? 'bg-green-100 border-green-300 text-green-700'
-                  : 'bg-gray-100 border-gray-300 text-gray-500'
-            }`}
-          >
-            {section.icon}
-            <span className="font-medium hidden sm:block">{section.title}</span>
-          </div>
-        ))}
+        {sections.map((section, index) => {
+          const isCompleted = getSectionCompletion(index);
+          const isCurrent = index === currentSection;
+          
+          return (
+            <div 
+              key={index}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm ${
+                isCurrent
+                  ? `bg-${section.color}-100 border-${section.color}-300 text-${section.color}-700` 
+                  : isCompleted
+                    ? 'bg-green-100 border-green-300 text-green-700'
+                    : 'bg-gray-100 border-gray-300 text-gray-500'
+              }`}
+            >
+              {isCompleted && !isCurrent ? (
+                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              ) : (
+                section.icon
+              )}
+              <span className="font-medium hidden sm:block">{section.title}</span>
+              {isCurrent && validationErrors.length > 0 && (
+                <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {validationErrors.length}
+                </span>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Current Section */}
@@ -717,44 +800,102 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
           </div>
         </div>
 
+        {/* Validation Summary */}
+        {validationErrors.length > 0 && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center space-x-2 mb-2">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
+              <h4 className="font-semibold text-red-800">Ontbrekende Antwoorden</h4>
+            </div>
+            <p className="text-red-700 text-sm mb-3">
+              De volgende vragen moeten beantwoord worden voordat u verder kunt:
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {validationErrors.map((questionId) => {
+                const question = currentQuestions.find(q => q.id === questionId);
+                return (
+                  <button
+                    key={questionId}
+                    onClick={() => {
+                      const element = document.querySelector(`[data-question-id="${questionId}"]`);
+                      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }}
+                    className="px-3 py-1 bg-red-200 text-red-800 rounded-full text-sm font-medium hover:bg-red-300 transition-colors"
+                  >
+                    Vraag {questionId}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Questions */}
         <div className="space-y-6">
-          {currentQuestions.map((question) => (
-            <div key={question.id} className="border border-gray-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-800 mb-3">
-                {question.id}. {question.question}
-              </h3>
-              
-              <div className="grid gap-2">
-                {question.options.map((option) => {
-                  const isChecked = question.type === 'checkbox' 
-                    ? ((answers[question.id] as string[]) || []).includes(option)
-                    : answers[question.id] === option;
-                    
-                  return (
-                    <label 
-                      key={option}
-                      className={`flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
-                        isChecked
-                          ? 'bg-blue-50 border-blue-300 text-blue-700' 
-                          : 'bg-white border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
-                      <input
-                        type={question.type === 'checkbox' ? 'checkbox' : 'radio'}
-                        name={question.type === 'checkbox' ? undefined : `question-${question.id}`}
-                        value={option}
-                        checked={isChecked}
-                        onChange={() => handleAnswer(question.id, option)}
-                        className="mr-3"
-                      />
-                      <span>{option}</span>
-                    </label>
-                  );
-                })}
+          {currentQuestions.map((question) => {
+            const hasError = validationErrors.includes(question.id);
+            
+            return (
+              <div 
+                key={question.id} 
+                data-question-id={question.id}
+                className={`border rounded-lg p-4 transition-colors ${
+                  hasError 
+                    ? 'border-red-300 bg-red-50' 
+                    : 'border-gray-200 bg-white'
+                }`}
+              >
+                <h3 className={`font-semibold mb-3 ${
+                  hasError ? 'text-red-800' : 'text-gray-800'
+                }`}>
+                  {question.id}. {question.question}
+                  <span className="text-red-500 ml-1">*</span>
+                </h3>
+                
+                {hasError && (
+                  <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <AlertTriangle className="w-4 h-4 text-red-600" />
+                      <span className="text-red-700 text-sm font-medium">
+                        Deze vraag is verplicht en moet beantwoord worden
+                      </span>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="grid gap-2">
+                  {question.options.map((option) => {
+                    const isChecked = question.type === 'checkbox' 
+                      ? ((answers[question.id] as string[]) || []).includes(option)
+                      : answers[question.id] === option;
+                      
+                    return (
+                      <label 
+                        key={option}
+                        className={`flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
+                          isChecked
+                            ? 'bg-blue-50 border-blue-300 text-blue-700' 
+                            : hasError
+                              ? 'bg-red-25 border-red-200 hover:bg-red-50'
+                              : 'bg-white border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        <input
+                          type={question.type === 'checkbox' ? 'checkbox' : 'radio'}
+                          name={question.type === 'checkbox' ? undefined : `question-${question.id}`}
+                          value={option}
+                          checked={isChecked}
+                          onChange={() => handleAnswer(question.id, option)}
+                          className="mr-3"
+                        />
+                        <span>{option}</span>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

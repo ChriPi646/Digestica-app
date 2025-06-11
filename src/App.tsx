@@ -97,7 +97,9 @@ const DigesticaApp: React.FC = () => {
                   currentPage === page ? 'text-blue-900 border-b-2 border-blue-900' : ''
                 }`}
               >
-                {page === 'fodmap' ? 'FODMAP' : page}
+                {page === 'fodmap' ? 'FODMAP' : 
+ page === 'specific-questionnaires' ? 'Gerichte vragen' : 
+ page}
               </button>
             ))}
           </div>

@@ -525,7 +525,27 @@ const SpecificDiseaseQuestionnaires: React.FC<SpecificQuestionnaireProps> = ({
               </button>
               {onNavigateToReports && (
                 <button
-                  onClick={() => onNavigateToReports(results)}
+                  onClick={() => {
+                    // Convert results to the format expected by ReportsMenu
+                    const reportData = {
+                      answers: answers,
+                      scores: {
+                        [questionnaire.id]: results?.score || 0,
+                        // Add other scores as 0 for compatibility
+                        ibs: questionnaire.id === 'ibs_rome_iv' ? (results?.score || 0) : 0,
+                        sibo: questionnaire.id === 'sibo_symptom' ? (results?.score || 0) : 0,
+                        celiac: questionnaire.id === 'celiac_csi' ? (results?.score || 0) : 0,
+                        lactose: questionnaire.id === 'lactose_intolerance' ? (results?.score || 0) : 0,
+                        ibd: 0,
+                        dyspepsia: 0,
+                        gastritis: 0
+                      }
+                    };
+                    
+                    // Save to localStorage for ReportsMenu
+                    localStorage.setItem('current_report', JSON.stringify(reportData));
+                    onNavigateToReports(reportData);
+                  }}
                   className="bg-blue-900 text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition-colors"
                 >
                   Bewaar Resultaat
