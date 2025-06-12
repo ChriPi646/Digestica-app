@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import BellyDrQuestionnaire from './components/BellyDrQuestionnaire';
 import ReportsMenu from './components/ReportsMenu';
 import SpecificDiseaseQuestionnaires from './components/SpecificDiseaseQuestionnaires';
+import FODMAPGuide from './components/FODMAPGuide';
 
 type PageType = 'home' | 'vragenlijst' | 'stappenplan' | 'agenda' | 'fodmap' | 'informatie' | 'shop' | 'login' | 'reports' | 'specific-questionnaires';
 const DigesticaApp: React.FC = () => {
@@ -145,7 +146,7 @@ const DigesticaApp: React.FC = () => {
           {[
             { 
               page: 'vragenlijst', 
-              title: 'Vragenlijst', 
+              title: 'Uitgebreide vragenlijst', 
               desc: 'Start met een uitgebreide vragenlijst voor diagnose-inzichten',
               icon: '📋',
               bgColor: 'bg-blue-50',
@@ -279,8 +280,8 @@ const DigesticaApp: React.FC = () => {
         return <PlaceholderPage title="Stappenplan" />;
       case 'agenda':
         return <PlaceholderPage title="Klachtenagenda" />;
-      case 'fodmap':
-        return <PlaceholderPage title="FODMAP Gids" />;
+case 'fodmap':
+        return <FODMAPGuide onBack={() => setCurrentPage('home')} />;
       case 'informatie':
         return <PlaceholderPage title="Informatie" />;
       case 'shop':

@@ -21,7 +21,7 @@ interface Questionnaire {
 }
 
 interface SpecificQuestionnaireProps {
-  onNavigateToReports?: (results: any) => void;
+  onNavigateToReports?: () => void;
   onBack?: () => void;
 }
 
@@ -480,7 +480,7 @@ const SpecificDiseaseQuestionnaires: React.FC<SpecificQuestionnaireProps> = ({
               </h2>
               <p className="text-gray-600">Evidence-based diagnostische analyse</p>
             </div>
-
+            
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-semibold text-blue-800">Score:</h3>
@@ -498,24 +498,12 @@ const SpecificDiseaseQuestionnaires: React.FC<SpecificQuestionnaireProps> = ({
                 {results.interpretation}
               </p>
             </div>
-
+            
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
               <h4 className="font-semibold text-gray-800 mb-2">🔬 Wetenschappelijke Basis:</h4>
               <p className="text-sm text-gray-600">{results.evidence}</p>
             </div>
-
-            {validationErrors.length > 0 && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <div className="flex items-center space-x-2 mb-2">
-                  <XCircle className="w-5 h-5 text-red-600" />
-                  <h4 className="font-semibold text-red-800">Validatiefout</h4>
-                </div>
-                <p className="text-red-700 text-sm">
-                  U dient alle vragen te beantwoorden. Vragen {validationErrors.join(', ')} zijn niet ingevuld.
-                </p>
-              </div>
-            )}
-
+            
             <div className="flex space-x-4 justify-center">
               <button
                 onClick={restartQuestionnaire}
@@ -526,25 +514,11 @@ const SpecificDiseaseQuestionnaires: React.FC<SpecificQuestionnaireProps> = ({
               {onNavigateToReports && (
                 <button
                   onClick={() => {
-                    // Convert results to the format expected by ReportsMenu
-                    const reportData = {
+                    localStorage.setItem('current_report', JSON.stringify({
                       answers: answers,
-                      scores: {
-                        [questionnaire.id]: results?.score || 0,
-                        // Add other scores as 0 for compatibility
-                        ibs: questionnaire.id === 'ibs_rome_iv' ? (results?.score || 0) : 0,
-                        sibo: questionnaire.id === 'sibo_symptom' ? (results?.score || 0) : 0,
-                        celiac: questionnaire.id === 'celiac_csi' ? (results?.score || 0) : 0,
-                        lactose: questionnaire.id === 'lactose_intolerance' ? (results?.score || 0) : 0,
-                        ibd: 0,
-                        dyspepsia: 0,
-                        gastritis: 0
-                      }
-                    };
-                    
-                    // Save to localStorage for ReportsMenu
-                    localStorage.setItem('current_report', JSON.stringify(reportData));
-                    onNavigateToReports(reportData);
+                      scores: results
+                    }));
+                    onNavigateToReports();
                   }}
                   className="bg-blue-900 text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition-colors"
                 >

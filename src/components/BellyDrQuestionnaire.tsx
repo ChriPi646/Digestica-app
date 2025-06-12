@@ -357,6 +357,35 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
         type: "select",
         options: ["Nooit", "Zelden", "1-2 glazen/week", "3-7 glazen/week", ">7 glazen/week"],
         scoring: { "Nooit": 0, "Zelden": 0, "1-2 glazen/week": 0, "3-7 glazen/week": { gastritis: 1 }, ">7 glazen/week": { gastritis: 3 } }
+     
+      },
+      {
+        id: 41,
+        question: "Heeft u ooit een H. Pylori infectie gehad of getest?",
+        type: "select",
+        options: ["Nooit getest", "Negatief getest", "Positief getest - behandeld", "Positief getest - niet behandeld", "Onbekend"],
+        scoring: { "Nooit getest": 0, "Negatief getest": 0, "Positief getest - behandeld": { gastritis: 3 }, "Positief getest - niet behandeld": { gastritis: 5 }, "Onbekend": 1 }
+      },
+      {
+        id: 42,
+        question: "Heeft u diabetes of problemen met bloedsuiker?",
+        type: "select",
+        options: ["Nee", "Pre-diabetes", "Type 1 diabetes", "Type 2 diabetes", "Gestationele diabetes", "Onbekend/niet getest"],
+       scoring: { "Nee": 0, "Pre-diabetes": { dyspepsia: 2 }, "Type 1 diabetes": { dyspepsia: 3 }, "Type 2 diabetes": { dyspepsia: 3 }, "Gestationele diabetes": { dyspepsia: 2 }, "Onbekend/niet getest": 1 }
+      },
+      {
+        id: 43,
+        question: "Heeft u schildklierproblemen?",
+        type: "select",
+        options: ["Nee", "Onderactieve schildklier (hypothyreoïdie)", "Overactieve schildklier (hyperthyreoïdie)", "Hashimoto", "Andere schildklieraandoening", "Onbekend/niet getest"],
+        scoring: { "Nee": 0, "Onderactieve schildklier (hypothyreoïdie)": { dyspepsia: 2 }, "Overactieve schildklier (hyperthyreoïdie)": { dyspepsia: 3 }, "Hashimoto": { dyspepsia: 2 }, "Andere schildklieraandoening": { dyspepsia: 2 }, "Onbekend/niet getest": 1 }
+      },
+      {
+        id: 44,
+        question: "Heeft u bekende voedselallergieën of intoleranties? (meerdere antwoorden mogelijk)",
+        type: "checkbox",
+        options: ["Nee", "Noten/pinda allergie", "Schaal- en schelpdieren", "Eieren", "Soja", "Sesam", "Andere allergieën"],
+        scoring: { "Nee": 0, "Noten/pinda allergie": { ibs: 1 }, "Schaal- en schelpdieren": { ibs: 1 }, "Eieren": { ibs: 1 }, "Soja": { ibs: 2 }, "Sesam": { ibs: 1 }, "Andere allergieën": { ibs: 2 } }
       }
     ]
   };
@@ -666,7 +695,28 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
           <button
             onClick={() => {
               console.log('Navigating to reports...');
-              localStorage.setItem('current_report', JSON.stringify({ answers, scores }));
+// Create unique report with timestamp
+const reportId = 'BD-' + Date.now().toString().slice(-6);
+const reportData = {
+  id: reportId,
+  date: new Date().toLocaleDateString('nl-NL'),
+  timestamp: Date.now(),
+  type: 'belly_dr_questionnaire',
+  answers,
+  scores,
+  patientData: {
+    initials: 'Pt.',
+    referenceNumber: reportId
+  }
+};
+
+// Get existing reports array
+const existingReports = JSON.parse(localStorage.getItem('belly_dr_reports') || '[]');
+const updatedReports = [reportData, ...existingReports];
+
+// Save updated array
+localStorage.setItem('belly_dr_reports', JSON.stringify(updatedReports));
+localStorage.setItem('current_report', JSON.stringify(reportData));
               if (onNavigateToReports) {
                 onNavigateToReports();
               } else {
@@ -685,14 +735,14 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
         
         <div className="flex justify-center mt-8">
           <button 
-           onClick={() => {
-              console.log('Navigating to reports...');
-              localStorage.setItem('current_report', JSON.stringify({ answers, scores }));
-              if (onNavigateToReports) {
-                onNavigateToReports();
-              } else {
-                alert('Navigatie niet beschikbaar');
-              }
+onClick={() => {
+  console.log('Navigating to reports...');
+localStorage.setItem('current_report', JSON.stringify({ answers, scores }));
+ if (onNavigateToReports) {
+    onNavigateToReports();
+  } else {
+    alert('Navigatie niet beschikbaar');
+  }
             }}
 
             className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"

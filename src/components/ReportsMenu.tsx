@@ -38,17 +38,16 @@ const ReportsMenu: React.FC<ReportsMenuProps> = ({ onBack, currentReport }) => {
   // Load saved reports from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('belly_dr_reports');
-    if (saved) {
-      setSavedReports(JSON.parse(saved));
-    }
+    const existingReports = saved ? JSON.parse(saved) : [];
+    setSavedReports(existingReports);
 
     // If there's a current report from questionnaire, save it automatically
     if (currentReport) {
-      saveCurrentReport();
+      saveCurrentReportToList(existingReports);
     }
   }, [currentReport]);
 
-  const saveCurrentReport = () => {
+  const saveCurrentReportToList = (existingReports: SavedReport[]) => {
     if (!currentReport) return;
 
     const newReport: SavedReport = {
@@ -63,9 +62,18 @@ const ReportsMenu: React.FC<ReportsMenuProps> = ({ onBack, currentReport }) => {
       }
     };
 
-    const updated = [newReport, ...savedReports];
-    setSavedReports(updated);
-    localStorage.setItem('belly_dr_reports', JSON.stringify(updated));
+    // Check if this report already exists (prevent duplicates)
+    const reportExists = existingReports.some(report => 
+      JSON.stringify(report.answers) === JSON.stringify(newReport.answers)
+    );
+
+    if (!reportExists) {
+      const updated = [newReport, ...existingReports];
+      setSavedReports(updated);
+      localStorage.setItem('belly_dr_reports', JSON.stringify(updated));
+    } else {
+      setSavedReports(existingReports);
+    }
   };
 
   const deleteReport = (reportId: string) => {
