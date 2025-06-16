@@ -3,8 +3,10 @@ import BellyDrQuestionnaire from './components/BellyDrQuestionnaire';
 import ReportsMenu from './components/ReportsMenu';
 import SpecificDiseaseQuestionnaires from './components/SpecificDiseaseQuestionnaires';
 import FODMAPGuide from './components/FODMAPGuide';
+import SymptomTracker from './components/SymptomTracker';
 
 type PageType = 'home' | 'vragenlijst' | 'stappenplan' | 'agenda' | 'fodmap' | 'informatie' | 'shop' | 'login' | 'reports' | 'specific-questionnaires';
+
 const DigesticaApp: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [showWelcomePopup, setShowWelcomePopup] = useState(true);
@@ -91,7 +93,8 @@ const DigesticaApp: React.FC = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-{(['home', 'vragenlijst', 'specific-questionnaires', 'stappenplan', 'agenda', 'fodmap', 'informatie', 'shop'] as PageType[]).map(page => (              <button 
+            {(['home', 'vragenlijst', 'specific-questionnaires', 'stappenplan', 'agenda', 'fodmap', 'informatie', 'shop'] as PageType[]).map(page => (
+              <button 
                 key={page}
                 onClick={() => setCurrentPage(page)}
                 className={`text-gray-700 hover:text-blue-900 px-3 py-2 text-sm font-medium capitalize transition-colors ${
@@ -99,8 +102,8 @@ const DigesticaApp: React.FC = () => {
                 }`}
               >
                 {page === 'fodmap' ? 'FODMAP' : 
- page === 'specific-questionnaires' ? 'Gerichte vragen' : 
- page}
+                 page === 'specific-questionnaires' ? 'Gerichte vragen' : 
+                 page}
               </button>
             ))}
           </div>
@@ -193,13 +196,13 @@ const DigesticaApp: React.FC = () => {
               textColor: 'text-red-700'
             },
             { 
-  page: 'specific-questionnaires', 
-  title: 'Specifieke Tests', 
-  desc: 'Evidence-based vragenlijsten per aandoening',
-  icon: '🔬',
-  bgColor: 'bg-purple-50',
-  textColor: 'text-purple-700'
-}
+              page: 'specific-questionnaires', 
+              title: 'Specifieke Tests', 
+              desc: 'Evidence-based vragenlijsten per aandoening',
+              icon: '🔬',
+              bgColor: 'bg-purple-50',
+              textColor: 'text-purple-700'
+            }
           ].map(({ page, title, desc, icon, bgColor, textColor }) => (
             <div 
               key={page}
@@ -274,19 +277,19 @@ const DigesticaApp: React.FC = () => {
     switch (currentPage) {
       case 'home':
         return <HomePage />;
-    case 'vragenlijst':
+      case 'vragenlijst':
         return <BellyDrQuestionnaire onNavigateToReports={() => setCurrentPage('reports')} />;
       case 'stappenplan':
         return <PlaceholderPage title="Stappenplan" />;
       case 'agenda':
-        return <PlaceholderPage title="Klachtenagenda" />;
-case 'fodmap':
+        return <SymptomTracker onBack={() => setCurrentPage('home')} />;
+      case 'fodmap':
         return <FODMAPGuide onBack={() => setCurrentPage('home')} />;
       case 'informatie':
         return <PlaceholderPage title="Informatie" />;
       case 'shop':
         return <PlaceholderPage title="Shop" />;
-     case 'reports':
+      case 'reports':
         return <ReportsMenu 
           onBack={() => setCurrentPage('home')} 
           currentReport={(() => {
@@ -294,16 +297,14 @@ case 'fodmap':
             return saved ? JSON.parse(saved) : null;
           })()} 
         />;
-     case 'specific-questionnaires':
-  return <SpecificDiseaseQuestionnaires 
-    onNavigateToReports={() => setCurrentPage('reports')}
-    onBack={() => setCurrentPage('home')} 
-  />;
-        case 'login':
-    
+      case 'specific-questionnaires':
+        return <SpecificDiseaseQuestionnaires 
+          onNavigateToReports={() => setCurrentPage('reports')}
+          onBack={() => setCurrentPage('home')} 
+        />;
+      case 'login':
         return <PlaceholderPage title="Login" />;
       default:
-        
         return <HomePage />;
     }
   };
