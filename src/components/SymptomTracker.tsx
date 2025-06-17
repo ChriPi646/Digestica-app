@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Plus, TrendingUp, Download, AlertTriangle, Utensils, Activity, Clock, ChevronLeft, ChevronRight, Eye, Trash2 } from 'lucide-react';
+import { Calendar, Plus, TrendingUp, Download, AlertTriangle, Utensils, Activity, Clock, ChevronLeft, Eye, Trash2 } from 'lucide-react';
 
 interface SymptomEntry {
   id: string;
@@ -100,13 +100,11 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
       notes: formData.notes!
     };
 
-    // Remove existing entry for this date
     const filteredEntries = entries.filter(e => e.date !== selectedDate);
     const newEntries = [...filteredEntries, entry].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    
     saveEntries(newEntries);
     setCurrentView('calendar');
-    
+
     // Reset form
     setFormData({
       symptoms: {
@@ -140,7 +138,6 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
   const getSymptomAverage = (symptom: keyof SymptomEntry['symptoms'], days: number = 7) => {
     const recentEntries = entries.slice(0, days);
     if (recentEntries.length === 0) return 0;
-    
     const total = recentEntries.reduce((sum, entry) => sum + entry.symptoms[symptom], 0);
     return Math.round((total / recentEntries.length) * 10) / 10;
   };
@@ -161,7 +158,7 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
     }));
   };
 
-  // Navigation Component
+  // Navigatie Component
   const Navigation = () => (
     <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
@@ -176,10 +173,8 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
                 <span>Terug</span>
               </button>
             )}
-            
             <h1 className="text-2xl font-bold text-blue-900">📅 Symptoom Agenda</h1>
           </div>
-
           <div className="flex items-center space-x-4">
             {['calendar', 'add', 'trends', 'export'].map((view) => (
               <button
@@ -208,14 +203,12 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
-    
     const firstDay = new Date(currentYear, currentMonth, 1);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
-    
+
     const dates = [];
     const currentDate = new Date(startDate);
-    
     for (let i = 0; i < 42; i++) {
       dates.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 1);
@@ -227,7 +220,6 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
             {today.toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' })}
           </h2>
-          
           <div className="grid grid-cols-7 gap-2 mb-4">
             {['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'].map(day => (
               <div key={day} className="text-center font-semibold text-gray-600 py-2">
@@ -235,18 +227,16 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
               </div>
             ))}
           </div>
-          
           <div className="grid grid-cols-7 gap-2">
             {dates.map((date, index) => {
               const dateStr = date.toISOString().split('T')[0];
               const dayEntries = getDateEntries(dateStr);
               const isCurrentMonth = date.getMonth() === currentMonth;
               const isToday = date.toDateString() === today.toDateString();
-              
-              const avgSymptoms = dayEntries.length > 0 
+              const avgSymptoms = dayEntries.length > 0
                 ? Object.values(dayEntries[0].symptoms).reduce((a, b) => a + b, 0) / 7
                 : 0;
-              
+
               const getIntensityColor = (avg: number) => {
                 if (avg === 0) return 'bg-gray-100';
                 if (avg <= 1) return 'bg-green-200';
@@ -265,8 +255,8 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
                     }
                   }}
                   className={`relative p-3 h-20 border rounded-lg cursor-pointer transition-colors ${
-                    isCurrentMonth 
-                      ? `${getIntensityColor(avgSymptoms)} hover:ring-2 hover:ring-blue-300` 
+                    isCurrentMonth
+                      ? `${getIntensityColor(avgSymptoms)} hover:ring-2 hover:ring-blue-300`
                       : 'bg-gray-50 text-gray-400'
                   } ${isToday ? 'ring-2 ring-blue-500' : ''}`}
                 >
@@ -296,7 +286,7 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Recent Entries */}
+        {/* Recente Invoer */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-xl font-semibold text-gray-800 mb-4">Recente Invoer</h3>
           <div className="space-y-4">
@@ -335,9 +325,9 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Entry Detail Modal */}
+        {/* Invoer Detail Modal */}
         {selectedEntry && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-96 overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">
@@ -350,7 +340,6 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
                   ✕
                 </button>
               </div>
-              
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <h4 className="font-semibold mb-2">Symptomen (0-5)</h4>
@@ -369,7 +358,6 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
                     ))}
                   </div>
                 </div>
-                
                 <div>
                   <h4 className="font-semibold mb-2">Overige Gegevens</h4>
                   <div className="space-y-2 text-sm">
@@ -381,7 +369,6 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
                   </div>
                 </div>
               </div>
-              
               <div className="mt-6">
                 <h4 className="font-semibold mb-2">Voedingsmiddelen</h4>
                 <div className="flex flex-wrap gap-2">
@@ -392,7 +379,6 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
                   ))}
                 </div>
               </div>
-              
               {selectedEntry.notes && (
                 <div className="mt-6">
                   <h4 className="font-semibold mb-2">Notities</h4>
@@ -406,7 +392,7 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
     );
   };
 
-  // Add Entry View
+  // Invoer Toevoegen View
   const AddEntryView = () => {
     const [newFood, setNewFood] = useState('');
 
@@ -416,9 +402,8 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
             Invoer toevoegen voor {new Date(selectedDate).toLocaleDateString('nl-NL')}
           </h2>
-
           <div className="space-y-8">
-            {/* Date Selection */}
+            {/* Datum Selectie */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Datum</label>
               <input
@@ -429,9 +414,9 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
               />
             </div>
 
-            {/* Symptoms */}
+            {/* Symptomen */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Symptomen (0 = geen, 5 = zeer ernstig)</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Symptomen (0 = geen, 5 = ernstig)</h3>
               <div className="grid md:grid-cols-2 gap-6">
                 {Object.entries(symptomLabels).map(([key, label]) => (
                   <div key={key}>
@@ -462,12 +447,12 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
               </div>
             </div>
 
-            {/* Stool Information */}
+            {/* Ontlasting Informatie */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Ontlasting</h3>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Bristol Ontlasting Schaal</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Bristol Stool Scale</label>
                   <select
                     value={formData.stoolType}
                     onChange={(e) => setFormData(prev => ({ ...prev, stoolType: parseInt(e.target.value) }))}
@@ -494,7 +479,7 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
               </div>
             </div>
 
-            {/* Foods */}
+            {/* Voedingsmiddelen */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Voedingsmiddelen</h3>
               <div className="flex space-x-2 mb-4">
@@ -522,7 +507,6 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
                   <Plus size={20} />
                 </button>
               </div>
-              
               <div className="flex flex-wrap gap-2">
                 {formData.foods?.map((food, index) => (
                   <span
@@ -542,7 +526,7 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
               </div>
             </div>
 
-            {/* Other Factors */}
+            {/* Overige Factoren */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Overige Factoren</h3>
               <div className="grid md:grid-cols-3 gap-6">
@@ -585,7 +569,7 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
               </div>
             </div>
 
-            {/* Notes */}
+            {/* Notities */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Notities (optioneel)</label>
               <textarea
@@ -597,7 +581,7 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
               />
             </div>
 
-            {/* Save Button */}
+            {/* Opslaan Knop */}
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
@@ -623,11 +607,48 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
   // Trends View
   const TrendsView = () => {
     const last30Days = entries.slice(0, 30);
+
+    // Debug: Check if we have data
+    const hasData = entries.length > 0;
     
+    // Create mock data for demonstration if no real data exists
+    const getMockData = () => {
+      const mockEntries = [];
+      for (let i = 13; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        mockEntries.push({
+          date: date.toISOString().split('T')[0],
+          symptoms: {
+            abdominalpain: Math.floor(Math.random() * 6),
+            bloating: Math.floor(Math.random() * 6),
+            gas: Math.floor(Math.random() * 6),
+            nausea: Math.floor(Math.random() * 6),
+            diarrhea: Math.floor(Math.random() * 6),
+            constipation: Math.floor(Math.random() * 6),
+            fatigue: Math.floor(Math.random() * 6),
+          }
+        });
+      }
+      return mockEntries;
+    };
+
     return (
       <div className="max-w-6xl mx-auto p-6">
+        {!hasData && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center space-x-2">
+              <AlertTriangle className="w-5 h-5 text-yellow-600" />
+              <span className="text-yellow-800 font-medium">Geen data beschikbaar</span>
+            </div>
+            <p className="text-yellow-700 text-sm mt-1">
+              Voeg eerst enkele symptoom invoeren toe via "➕ Toevoegen" om trends te zien.
+            </p>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {/* Quick Statistics */}
+          {/* Snelle Statistieken */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">📊 7-Dagen Gemiddelden</h3>
             <div className="space-y-3">
@@ -660,7 +681,16 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
                   });
                 });
                 
-                return Object.entries(foodCounts)
+                const foodEntries = Object.entries(foodCounts);
+                if (foodEntries.length === 0) {
+                  return (
+                    <div className="text-sm text-gray-500 italic">
+                      Nog geen voedingsgegevens beschikbaar
+                    </div>
+                  );
+                }
+                
+                return foodEntries
                   .sort(([,a], [,b]) => b - a)
                   .slice(0, 8)
                   .map(([food, count]) => (
@@ -685,11 +715,10 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
                       avg: getSymptomAverage(key as keyof SymptomEntry['symptoms'])
                     }));
                     const highest = avgSymptoms.reduce((prev, current) => prev.avg > current.avg ? prev : current);
-                    return `${highest.symptom} (${highest.avg.toFixed(1)}/5)`;
+                    return highest.avg > 0 ? `${highest.symptom} (${highest.avg.toFixed(1)}/5)` : 'Geen data beschikbaar';
                   })()}
                 </div>
               </div>
-              
               <div className="p-3 bg-green-50 rounded-lg">
                 <div className="font-medium text-green-800">Invoer deze maand</div>
                 <div className="text-green-600">{entries.length} dagen geregistreerd</div>
@@ -698,46 +727,89 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Weekly Comparison Chart */}
+        {/* Wekelijkse Vergelijking Grafiek */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">📈 Symptoom Trends (Laatste 14 Dagen)</h3>
-          <div className="space-y-4">
-            {Object.entries(symptomLabels).map(([key, label]) => {
-              const last14Days = entries.slice(0, 14).reverse();
-              return (
-                <div key={key}>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium text-gray-700">{label}</span>
-                    <span className="text-sm text-gray-500">
-                      Gem: {getSymptomAverage(key as keyof SymptomEntry['symptoms'], 14).toFixed(1)}
-                    </span>
+          {hasData ? (
+            <div className="space-y-6">
+              {Object.entries(symptomLabels).map(([key, label]) => {
+                const last14Days = entries.slice(0, 14).reverse();
+                const dataToShow = last14Days.length > 0 ? last14Days : [];
+                
+                return (
+                  <div key={key}>
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="font-medium text-gray-700">{label}</span>
+                      <span className="text-sm text-gray-500">
+                        Gem: {getSymptomAverage(key as keyof SymptomEntry['symptoms'], 14).toFixed(1)}
+                      </span>
+                    </div>
+                    <div className="relative">
+                      <div className="flex items-end justify-between h-20 bg-gray-50 rounded-lg p-3 border">
+                        {dataToShow.length > 0 ? dataToShow.map((entry, index) => {
+                          const value = entry.symptoms[key as keyof SymptomEntry['symptoms']];
+                          const height = Math.max((value / 5) * 100, 5); // Minimum height for visibility
+                          return (
+                            <div
+                              key={index}
+                              className="flex flex-col items-center group"
+                              style={{ width: `${100 / Math.max(dataToShow.length, 14)}%` }}
+                            >
+                              <div
+                                className={`w-full max-w-6 rounded-t transition-all duration-200 group-hover:opacity-80 ${
+                                  value === 0 ? 'bg-green-400' :
+                                  value <= 2 ? 'bg-yellow-400' :
+                                  value <= 4 ? 'bg-orange-400' : 'bg-red-400'
+                                }`}
+                                style={{ height: `${height}%`, minHeight: '8px' }}
+                                title={`${new Date(entry.date).toLocaleDateString('nl-NL')}: ${value}/5`}
+                              />
+                              <div className="text-xs text-gray-500 mt-1 transform rotate-45 origin-bottom-left">
+                                {new Date(entry.date).getDate()}
+                              </div>
+                            </div>
+                          );
+                        }) : (
+                          // Show empty state
+                          Array.from({ length: 14 }, (_, index) => (
+                            <div
+                              key={index}
+                              className="flex flex-col items-center"
+                              style={{ width: `${100 / 14}%` }}
+                            >
+                              <div className="w-full max-w-6 h-2 bg-gray-200 rounded-t" />
+                              <div className="text-xs text-gray-400 mt-1">-</div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                      {/* Y-axis labels */}
+                      <div className="absolute left-0 top-0 h-20 flex flex-col justify-between text-xs text-gray-400 -ml-6">
+                        <span>5</span>
+                        <span>3</span>
+                        <span>1</span>
+                        <span>0</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-end space-x-1 h-16 bg-gray-50 rounded p-2">
-                    {last14Days.map((entry, index) => {
-                      const value = entry.symptoms[key as keyof SymptomEntry['symptoms']];
-                      const height = (value / 5) * 100;
-                      return (
-                        <div
-                          key={index}
-                          className="flex-1 flex flex-col items-center"
-                        >
-                          <div
-                            className={`w-full rounded-t ${
-                              value === 0 ? 'bg-green-400' :
-                              value <= 2 ? 'bg-yellow-400' :
-                              value <= 4 ? 'bg-orange-400' : 'bg-red-400'
-                            }`}
-                            style={{ height: `${height}%` }}
-                            title={`${new Date(entry.date).toLocaleDateString('nl-NL')}: ${value}/5`}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            // Demo data for when no real data exists
+            <div className="space-y-6">
+              <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <h4 className="text-lg font-medium text-gray-600 mb-2">Nog geen data beschikbaar</h4>
+                <p className="text-gray-500 mb-4">Voeg symptoom invoeren toe om trends te bekijken</p>
+                <button
+                  onClick={() => setCurrentView('add')}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  ➕ Eerste Invoer Toevoegen
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -747,7 +819,7 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
   const ExportView = () => {
     const exportData = () => {
       const csvContent = [
-        ['Datum', 'Buikpijn', 'Opgeblazen', 'Gas', 'Misselijkheid', 'Diarree', 'Constipatie', 'Vermoeidheid', 'Ontlasting Type', 'Frequentie', 'Humeur', 'Stress', 'Slaap', 'Voeding', 'Notities'].join(','),
+        ['Datum', 'Buikpijn', 'Opgeblazen', 'Gas', 'Misselijkheid', 'Diarree', 'Constipatie', 'Vermoeidheid', 'Bristol Type', 'Frequentie', 'Humeur', 'Stress', 'Slaap', 'Voedingsmiddelen', 'Notities'],
         ...entries.map(entry => [
           entry.date,
           entry.symptoms.abdominalpain,
@@ -780,7 +852,6 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">📤 Gegevens Exporteren</h2>
-          
           <div className="space-y-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-blue-800 mb-2">Overzicht</h3>
@@ -790,7 +861,7 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
                 </div>
                 <div>
                   <span className="font-medium">Periode:</span> {
-                    entries.length > 0 
+                    entries.length > 0
                       ? `${new Date(entries[entries.length - 1].date).toLocaleDateString('nl-NL')} - ${new Date(entries[0].date).toLocaleDateString('nl-NL')}`
                       : 'Geen gegevens'
                   }
@@ -805,7 +876,7 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
               <button
                 onClick={exportData}
                 disabled={entries.length === 0}
-                className="w-full flex items-center justify-center space-x-2 bg-green-600 text-white py-4 px-6 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center space-x-2 bg-green-600 text-white py-4 px-6 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Download size={20} />
                 <span>Download CSV Bestand</span>
@@ -814,7 +885,7 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <h4 className="font-semibold text-yellow-800 mb-2">📋 Voor uw Zorgverlener</h4>
                 <p className="text-yellow-700 text-sm mb-3">
-                  Het CSV bestand bevat al uw symptoom- en voedingsgegevens in een format dat gemakkelijk te delen is met uw arts of diëtist.
+                  Het CSV bestand bevat al uw symptoom- en voedingsgegevens in een format dat uw arts kan gebruiken.
                 </p>
                 <ul className="text-yellow-700 text-sm space-y-1">
                   <li>• Volledig symptoomoverzicht per dag</li>
@@ -833,7 +904,6 @@ const SymptomTracker: React.FC<SymptomTrackerProps> = ({ onBack }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
       {currentView === 'calendar' && <CalendarView />}
       {currentView === 'add' && <AddEntryView />}
       {currentView === 'trends' && <TrendsView />}
