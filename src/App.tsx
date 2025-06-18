@@ -86,7 +86,7 @@ const DigesticaApp: React.FC = () => {
             <img 
               src="/TheBellyDrLogo.png" 
               alt="The Belly Dr." 
-              className="h-12 w-auto cursor-pointer"
+              className="h-18 w-auto cursor-pointer"
               onClick={() => setCurrentPage('home')}
             />
           </div>
