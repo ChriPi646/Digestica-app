@@ -4,7 +4,6 @@ import ReportsMenu from './components/ReportsMenu';
 import SpecificDiseaseQuestionnaires from './components/SpecificDiseaseQuestionnaires';
 import FODMAPGuide from './components/FODMAPGuide';
 import SymptomTracker from './components/SymptomTracker';
-
 type PageType = 'home' | 'vragenlijst' | 'stappenplan' | 'agenda' | 'fodmap' | 'informatie' | 'shop' | 'login' | 'reports' | 'specific-questionnaires';
 
 const DigesticaApp: React.FC = () => {
@@ -30,47 +29,47 @@ const DigesticaApp: React.FC = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center relative">
-          <button
+<div className="bg-white rounded-2xl pt-1 px-6 pb-6 max-w-md w-full text-center relative">          <button
             onClick={() => setShowWelcomePopup(false)}
             className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
           >
             ✕
           </button>
           
-          <div className="flex items-center justify-center mb-4">
-            <img 
-              src="/TheBellyDrLogo.png" 
-              alt="The Belly Dr." 
-              className="h-32 w-auto"
-            />
-          </div>
+         <div className="flex items-center justify-center">
+  <div className="h-48 flex items-center justify-center">
+    <img 
+      src="/TheBellyDrLogo.png" 
+      alt="The Belly Dr." 
+      className="h-full w-auto object-contain"
+    />
+  </div>
+</div>
           
-          <h2 className="text-3xl font-bold text-blue-900 mb-6 leading-tight">
-            🔍 Ontdek eindelijk de<br />oorzaak van uw buikklachten
-          </h2>
+          <h2 className="text-3xl font-bold text-blue-900 mb-6 leading-tight -mt-8">
+  🎯 Eindelijk duidelijkheid over<br />uw buikklachten
+</h2>
           
-          <p className="text-gray-600 mb-8 text-lg leading-relaxed">
-            Beantwoord enkele vragen en krijg een gepersonaliseerd inzicht in mogelijke oorzaken van uw klachten.
-          </p>
-          
+          <p className="text-gray-600 mb-6 text-lg leading-relaxed">
+  <strong>Gratis analyse in 5 minuten.</strong><br />
+  Wetenschappelijke vragenlijst geeft u direct inzicht in mogelijke oorzaken.
+</p>
           <button
             onClick={() => {
               setShowWelcomePopup(false);
               setCurrentPage('vragenlijst');
             }}
-            className="w-full bg-blue-900 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-800 transition-colors mb-8"
-          >
+className="w-full bg-blue-900 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-800 transition-colors mb-6"          >
             🎯 Start Analyse
           </button>
           
           <div className="flex items-center justify-center space-x-2">
-            <img 
-              src="/digestica-logo.png" 
-              alt="Digestica" 
-              className="h-8 w-auto"
-            />
-          </div>
+<img 
+  src="/digestica-logo.png" 
+  alt="Digestica" 
+  className="h-6 w-auto"
+/>
+ </div>
         </div>
       </div>
     );
@@ -86,26 +85,19 @@ const DigesticaApp: React.FC = () => {
             <img 
               src="/TheBellyDrLogo.png" 
               alt="The Belly Dr." 
-              className="h-18 w-auto cursor-pointer"
+              className="h-14 w-auto cursor-pointer"
               onClick={() => setCurrentPage('home')}
             />
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            {(['home', 'vragenlijst', 'specific-questionnaires', 'stappenplan', 'agenda', 'fodmap', 'informatie', 'shop'] as PageType[]).map(page => (
-              <button 
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`text-gray-700 hover:text-blue-900 px-3 py-2 text-sm font-medium capitalize transition-colors ${
-                  currentPage === page ? 'text-blue-900 border-b-2 border-blue-900' : ''
-                }`}
-              >
-                {page === 'fodmap' ? 'FODMAP' : 
-                 page === 'specific-questionnaires' ? 'Gerichte vragen' : 
-                 page}
-              </button>
-            ))}
+          {/* Essential Navigation */}
+          <div className="flex items-center">
+            <button
+              onClick={() => setCurrentPage('vragenlijst')}
+              className="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition-colors font-medium"
+            >
+              📋 Start Analyse
+            </button>
           </div>
 
           {/* Login Button */}
@@ -134,7 +126,7 @@ const DigesticaApp: React.FC = () => {
             <img 
               src="/TheBellyDrLogo.png" 
               alt="The Belly Dr." 
-              className="h-32 w-auto"
+             className="h-24 w-auto max-w-full"
             />
           </div>
           <h2 className="text-3xl font-bold text-gray-800 mb-4">Analyse van Buikklachten</h2>
@@ -220,7 +212,7 @@ const DigesticaApp: React.FC = () => {
 
         {/* Professional Disclaimer */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">Belangrijke Disclaimer</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-3">Belangrijke Disclaimer</h3>
           <div className="text-sm text-gray-600 space-y-2">
             <p className="font-medium text-gray-800">
               <strong>CentepedeX neemt geen enkele verantwoordelijkheid in de waarde van de resultaten.</strong>

@@ -65,10 +65,10 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
       description: "Gerichte vragen per aandoening"
     },
     {
-      title: "Aanvullende Gezondheidsvragen",
+      title: "Red Flags & Comorbiditeiten",
       icon: <AlertTriangle className="w-6 h-6" />,
       color: "orange",
-      description: "Aanvullende vragen over uw gezondheid"
+      description: "Alarmsymptomen en bijkomende klachten"
     },
     {
       title: "Lifestyle & Voeding",
@@ -267,8 +267,8 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
         id: 28,
         question: "Heeft u huidproblemen (eczeem, uitslag, jeuk)?",
         type: "select",
-        options: ["Nee", "Lichte huidklachten", "Eczeem", "Chronische uitslag", "Blaasvormende huiduitslag"],
-        scoring: { "Nee": 0, "Lichte huidklachten": 1, "Eczeem": { celiac: 2 }, "Chronische uitslag": { celiac: 3 }, "Blaasvormende huiduitslag": { celiac: 5 } }
+        options: ["Nee", "Lichte huidklachten", "Eczeem", "Chronische uitslag", "Dermatitis herpetiformis"],
+        scoring: { "Nee": 0, "Lichte huidklachten": 1, "Eczeem": { celiac: 2 }, "Chronische uitslag": { celiac: 3 }, "Dermatitis herpetiformis": { celiac: 5 } }
       },
       {
         id: 29,
@@ -285,7 +285,7 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
         scoring: { "Nooit geprobeerd": 0, "Geen verschil": { lactose: -1 }, "Iets beter": { lactose: 2 }, "Veel beter": { lactose: 4 }, "Volledig klachtenvrij": { lactose: 5 } }
       }
     ],
-    3: [ // Aanvullende Gezondheidsvragen
+    3: [ // Red Flags & Comorbiditeiten
       {
         id: 31,
         question: "Heeft u wel eens koorts gehad samen met uw buikklachten?",
@@ -361,7 +361,7 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
       },
       {
         id: 41,
-        question: "Heeft u ooit een maagbacterie (H. Pylori) infectie gehad of getest?",
+        question: "Heeft u ooit een H. Pylori infectie gehad of getest?",
         type: "select",
         options: ["Nooit getest", "Negatief getest", "Positief getest - behandeld", "Positief getest - niet behandeld", "Onbekend"],
         scoring: { "Nooit getest": 0, "Negatief getest": 0, "Positief getest - behandeld": { gastritis: 3 }, "Positief getest - niet behandeld": { gastritis: 5 }, "Onbekend": 1 }
@@ -589,13 +589,13 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {Object.entries(scores).map(([condition, score]) => {
             const conditionNames: { [key: string]: string } = {
-              ibs: "Prikkelbare darm (IBS)",
-              sibo: "Bacteriële overgroei dunne darm (SIBO)", 
-              celiac: "Glutenintolerantie (Coeliakie)",
-              lactose: "Lactose-intolerantie",
-              ibd: "Darmonsteking (IBD)",
-              dyspepsia: "Maagklachten (Dyspepsie)",
-              gastritis: "Maagontsteking (Gastritis)"
+              ibs: "Irritable Bowel Syndrome (IBS)",
+              sibo: "Small Intestinal Bacterial Overgrowth (SIBO)", 
+              celiac: "Coeliakie (Glutenintolerantie)",
+              lactose: "Lactose Intolerantie",
+              ibd: "Inflammatory Bowel Disease (IBD)",
+              dyspepsia: "Functional Dyspepsia",
+              gastritis: "Gastritis/H. Pylori"
             };
 
             const getScoreColor = (score: number): string => {
@@ -637,13 +637,13 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
             const maxScore = Math.max(...Object.values(scores));
             const topCondition = Object.entries(scores).find(([_, score]) => score === maxScore);
             const conditionNames: { [key: string]: string } = {
-              ibs: "Prikkelbare darm (IBS)",
-              sibo: "Bacteriële overgroei dunne darm (SIBO)", 
-              celiac: "Glutenintolerantie (Coeliakie)",
-              lactose: "Lactose-intolerantie",
-              ibd: "Darmonsteking (IBD)",
-              dyspepsia: "Maagklachten (Dyspepsie)",
-              gastritis: "Maagontsteking (Gastritis)"
+              ibs: "Irritable Bowel Syndrome (IBS)",
+              sibo: "Small Intestinal Bacterial Overgrowth (SIBO)", 
+              celiac: "Coeliakie",
+              lactose: "Lactose Intolerantie",
+              ibd: "Inflammatory Bowel Disease",
+              dyspepsia: "Functional Dyspepsia",
+              gastritis: "Gastritis"
             };
             
             return (
@@ -663,39 +663,19 @@ const BellyDrQuestionnaire: React.FC<BellyDrQuestionnaireProps> = ({ onNavigateT
             <h3 className="text-lg font-bold text-green-800 mb-3">🚀 Aanbevolen Vervolgstappen</h3>
             <ul className="space-y-2 text-green-700">
               <li>• Bespreek resultaten met uw huisarts</li>
-              <li>• Overweeg eliminatiedieet (bepaalde voeding tijdelijk weglaten)</li>
-              <li>• Houd klachtendagboek bij</li>
-              <li>• Werk aan stressvermindering</li>
+              <li>• Overweeg eliminatiedieet (FODMAP)</li>
+              <li>• Houd symptoomdagboek bij</li>
+              <li>• Stressmanagement technieken</li>
             </ul>
           </div>
 
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
             <h3 className="text-lg font-bold text-purple-800 mb-3">🔬 Aanbevolen Zelftesten</h3>
             <ul className="space-y-2 text-purple-700">
-              <li>• <button 
-                onClick={() => window.open('https://shop.example.com/sibo-breath-test?ref=bellydr', '_blank')}
-                className="text-purple-600 hover:text-purple-800 underline"
-              >
-                Ademtest voor bacteriële overgroei (€179)
-              </button></li>
-              <li>• <button 
-                onClick={() => window.open('https://shop.example.com/stool-analysis?ref=bellydr', '_blank')}
-                className="text-purple-600 hover:text-purple-800 underline"
-              >
-                Uitgebreide ontlastingstest (€229)
-              </button></li>
-              <li>• <button 
-                onClick={() => window.open('https://shop.example.com/food-sensitivity?ref=bellydr', '_blank')}
-                className="text-purple-600 hover:text-purple-800 underline"
-              >
-                Voedselgevoeligheidstest (€149)
-              </button></li>
-              <li>• <button 
-                onClick={() => window.open('https://shop.example.com/celiac-test?ref=bellydr', '_blank')}
-                className="text-purple-600 hover:text-purple-800 underline"
-              >
-                Glutenintolerantie test (€129)
-              </button></li>
+              <li>• SIBO Breath Test Kit (€179)</li>
+              <li>• Comprehensive Stool Analysis (€229)</li>
+              <li>• Food Sensitivity Panel (€149)</li>
+              <li>• Coeliakie Test Panel (€129)</li>
             </ul>
           </div>
         </div>
@@ -752,6 +732,24 @@ localStorage.setItem('current_report', JSON.stringify(reportData));
             <span>Rapport Afdrukken</span>
           </button>
         </div>
+        
+        <div className="flex justify-center mt-8">
+          <button 
+onClick={() => {
+  console.log('Navigating to reports...');
+localStorage.setItem('current_report', JSON.stringify({ answers, scores }));
+ if (onNavigateToReports) {
+    onNavigateToReports();
+  } else {
+    alert('Navigatie niet beschikbaar');
+  }
+            }}
+
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          >
+            Nieuwe Dr. Belly Analyse Starten
+          </button>
+        </div>
       </div>
     );
   }
@@ -769,6 +767,24 @@ localStorage.setItem('current_report', JSON.stringify(reportData));
         </div>
         <h1 className="text-3xl font-bold text-blue-600 mb-2">🩺 Dr. Belly Uitgebreide Vragenlijst</h1>
         <p className="text-gray-600">Evidence-based diagnostiek voor buikklachten</p>
+        
+        {/* TEMPORARY TEST BUTTON - Remove later */}
+        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <button
+            onClick={() => {
+              const mockAnswers = {
+                1: "31-45", 2: "6-12 maanden", 3: ["IBS (prikkelbare darm)"], 4: ["Nee"],
+                6: "Onderbuik links", 7: "3-4 dagen/week", 8: "2-3x per dag", 9: "Wisselend hard/zacht",
+                10: "Nooit", 11: "Vaak", 15: "Duidelijk erger bij stress"
+              };
+              setAnswers(mockAnswers);
+              setShowResults(true);
+            }}
+            className="bg-yellow-600 text-white px-4 py-2 rounded text-sm"
+          >
+            🧪 Test Resultaten (Mock Data)
+          </button>
+        </div>
         
         {/* Progress Bar */}
         <div className="mt-4">
